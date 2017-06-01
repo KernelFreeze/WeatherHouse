@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Weather House</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Mostrar/Ocultar navegación</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                <a class="navbar-brand" href="#">Weather House</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="led.html">Luces</a></li>
+                    <li class="active"><a href="#">Predicciones</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Predicciones de Temperatura para la próxima hora</h1>
+        <p>
+          Temperatura: <span id='temp'>Cargando...</span>
+        </p>
+        <p>
+          Humedad: <span id='hum'>Cargando...</span>
+        </p>
+        <button type="button" name="guardar" onclick="enviar()">Guardar y enviar</button>
+    </div>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $.get("http://iotserver1.dis.eafit.edu.co/weather/lmpelaezt", function(data) {
+            data = data.split("\n")
+
+            // Temperatura
+            let temp
+            if (data[0]) {
+                temp = parseInt(data[0].split(",")[1]);
+            }
+            if (data[1]) {
+                temp += parseInt(data[1].split(",")[1]);
+                temp = temp / 2
+            }
+            $("#temp").text(temp)
+
+            // Humedad
+            let hum
+            if (data[0]) {
+                hum = parseInt(data[0].split(",")[2]);
+            }
+            if (data[1]) {
+                hum += parseInt(data[1].split(",")[2]);
+                hum = hum / 2
+            }
+            $("#hum").text(hum)
+
+
+            window.enviar = function () {
+              let date = new Date().toISOString()
+                $.get(`http://iotserver1.dis.eafit.edu.co/weather/sendMyPrediction?idhome=lmpelaezt&predtemp=${temp}&predhumid=${hum}&timestamp=${date}`)
+            }
+        });
+    </script>
+</body>
+</html>
